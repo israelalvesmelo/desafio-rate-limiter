@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 )
 
 type WebServer struct {
@@ -27,11 +26,14 @@ func (s *WebServer) AddHandler(path string, handler http.HandlerFunc) {
 	s.Handlers[path] = handler
 }
 
+func (s *WebServer) AddMiddleware(m func(http.Handler) http.Handler) {
+	s.Router.Use(m)
+}
+
 // loop through the handlers and add them to the router
 // register middeleware logger
 // start the server
 func (s *WebServer) Start() {
-	s.Router.Use(middleware.Logger)
 	for path, handler := range s.Handlers {
 		s.Router.Handle(path, handler)
 	}

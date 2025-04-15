@@ -14,17 +14,17 @@ import (
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/dto"
 )
 
-type APIKeyHandler struct {
+type RateLimitConfigHandler struct {
 	useCase usecase.CreateRateLimitConfigUseCase
 }
 
-func NewAPIKeyHandler(useCase usecase.CreateRateLimitConfigUseCase) *APIKeyHandler {
-	return &APIKeyHandler{
+func NewRateLimitConfigHandler(useCase usecase.CreateRateLimitConfigUseCase) *RateLimitConfigHandler {
+	return &RateLimitConfigHandler{
 		useCase: useCase,
 	}
 }
 
-func (h *APIKeyHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request) {
+func (h *RateLimitConfigHandler) Create(w http.ResponseWriter, r *http.Request) {
 	input := dto.RateLimitConfigInput{}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		log.Println("error decoding input data:", err.Error())
@@ -60,7 +60,7 @@ func (h *APIKeyHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request) {
 }
 
 // getClientIP extracts the client IP from the request
-func (h *APIKeyHandler) getClientIP(r *http.Request) string {
+func (h *RateLimitConfigHandler) getClientIP(r *http.Request) string {
 	// Check X-Forwarded-For header
 	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
 		ips := net.ParseIP(xff)
@@ -74,7 +74,7 @@ func (h *APIKeyHandler) getClientIP(r *http.Request) string {
 	return ip
 }
 
-func (h *APIKeyHandler) validateInput(input dto.RateLimitConfigInput) error {
+func (h *RateLimitConfigHandler) validateInput(input dto.RateLimitConfigInput) error {
 	validate := validator.New()
 	return validate.Struct(input)
 }

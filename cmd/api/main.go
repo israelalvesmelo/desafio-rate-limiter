@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/israelalvesmelo/desafio-rate-limiter/cmd/api/config"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/domain/usecase"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/database"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/handler"
+	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/middleware"
+
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/webserver"
 	"github.com/redis/go-redis/v9"
 )
@@ -32,7 +35,20 @@ func main() {
 	// Create use case
 	createApiKey := usecase.NewRateLimitConfigUseCase(storageGateway)
 
+	// Create handler
+	helloWorldHandler := handler.NewHelloWorldHandler()
+	rateLimitConfigHandler := handler.NewRateLimitConfigHandler(createApiKey)
+
+	// Create middleware
+	limiter := middleware.NewRateLimitMiddleware()
+
+	// Create webserver
 	server := webserver.NewWebServer(fmt.Sprintf(":%s", cfg.App.Port))
-	server.AddHandler("/limiter", handler.NewAPIKeyHandler(createApiKey).CreateAPIKey)
+	server.AddMiddleware(limiter.Handler)
+	server.AddMiddleware(chimiddleware.Logger)
+
+	server.AddHandler("/limiter", rateLimitConfigHandler.Create)
+	server.AddHandler("/hello", helloWorldHandler.HelloWorld)
+
 	server.Start()
 }
