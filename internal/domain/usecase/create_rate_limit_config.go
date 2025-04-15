@@ -58,7 +58,9 @@ func (c *CreateRateLimitConfigUseCaseImpl) Execute(ctx context.Context, input Cr
 	}
 
 	return &dto.RateLimitConfigOutput{
-		Key: rtConf.Value,
+		Key:           rtConf.Value,
+		Limit:         rtConf.Limit,
+		BlockDuration: rtConf.BlockDuration,
 	}, nil
 }
 

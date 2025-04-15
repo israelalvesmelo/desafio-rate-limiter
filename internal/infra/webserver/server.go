@@ -1,7 +1,9 @@
 package webserver
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -33,5 +35,11 @@ func (s *WebServer) Start() {
 	for path, handler := range s.Handlers {
 		s.Router.Handle(path, handler)
 	}
-	http.ListenAndServe(s.WebServerPort, s.Router)
+
+	log.Println("Starting web server on port", s.WebServerPort)
+
+	if err := http.ListenAndServe(s.WebServerPort, s.Router); err != nil {
+		log.Println("server error", "error", err)
+		os.Exit(1)
+	}
 }

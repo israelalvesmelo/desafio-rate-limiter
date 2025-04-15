@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/domain/usecase"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/dto"
 )
@@ -27,6 +28,12 @@ func (h *APIKeyHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request) {
 	input := dto.RateLimitConfigInput{}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		log.Println("error decoding input data:", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := h.validateInput(input); err != nil {
+		log.Println("Erro de validação:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -65,4 +72,9 @@ func (h *APIKeyHandler) getClientIP(r *http.Request) string {
 	// Extract from RemoteAddr
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
 	return ip
+}
+
+func (h *APIKeyHandler) validateInput(input dto.RateLimitConfigInput) error {
+	validate := validator.New()
+	return validate.Struct(input)
 }
