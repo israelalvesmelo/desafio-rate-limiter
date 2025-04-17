@@ -1,7 +1,8 @@
 package dto
 
 type RateLimitConfigOutput struct {
-	Key           string `json:"key"`
-	Limit         int    `json:"limit"`
-	BlockDuration int    `json:"block_duration"`
+	Key             string `json:"key"`
+	MaxRequests     int    `json:"max_requests"`
+	TimeWindow      int64  `json:"time_window"`
+	BlockedDuration int64  `json:"block_duration"`
 }

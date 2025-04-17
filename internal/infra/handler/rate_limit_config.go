@@ -39,10 +39,11 @@ func (h *RateLimitConfigHandler) Create(w http.ResponseWriter, r *http.Request) 
 	}
 
 	result, err := h.useCase.Execute(r.Context(), usecase.CreateRateLimitConfigInput{
-		Ip:            h.getClientIP(r),
-		IsToken:       input.IsToken,
-		Limit:         input.Limit,
-		BlockDuration: input.BlockDuration,
+		Ip:              h.getClientIP(r),
+		IsToken:         input.IsToken,
+		MaxRequests:     input.MaxRequests,
+		TimeWindow:      input.TimeWindow,
+		BlockedDuration: input.BlockDuration,
 	})
 
 	if err != nil {

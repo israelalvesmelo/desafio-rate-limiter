@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net"
@@ -16,10 +17,10 @@ import (
 
 type RateLimiterMiddleware struct {
 	storage database.StorageDb
-	config  config.Config
+	config  config.RateLimiter
 }
 
-func NewRateLimitMiddleware(storage database.StorageDb, config config.Config) *RateLimiterMiddleware {
+func NewRateLimitMiddleware(storage database.StorageDb, config config.RateLimiter) *RateLimiterMiddleware {
 	return &RateLimiterMiddleware{
 		storage: storage,
 		config:  config,
@@ -28,15 +29,16 @@ func NewRateLimitMiddleware(storage database.StorageDb, config config.Config) *R
 
 func (m *RateLimiterMiddleware) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		key := getKey(r)
-		//TODO: Aqui tenho que buscar o os valores da confg no redis ou no banco de dados
-		limiter := usecase.NewLimiter(m.storage, m.config)
+		key, keyType := m.getKey(r)
+		rtConfig := m.getRateLimitConfig(r.Context(), key, keyType)
 
+		limiter := usecase.NewLimiter(m.storage)
 		resp, err := limiter.Execute(r.Context(),
 			dto.RequestSave{
-				Key:      key,
 				TimeAdd: time.Now(),
-			})
+			},
+			rtConfig,
+		)
 		if errors.Is(err, entity.ErrIPExceededAmountRequest) {
 			log.Printf("Error executing request: %s\n", err.Error())
 			http.Error(w, err.Error(), http.StatusTooManyRequests)
@@ -58,17 +60,17 @@ func (m *RateLimiterMiddleware) Handler(next http.Handler) http.Handler {
 	})
 }
 
-func getKey(r *http.Request) string {
-	apiKey := r.Header.Get(entity.APIKeyHeaderName)
+func (m *RateLimiterMiddleware) getKey(r *http.Request) (string, string) {
+	apiKey := r.Header.Get(entity.APIKeyName)
 	if apiKey != "" {
-		return apiKey
+		return apiKey, entity.APIKeyName
 	}
-	ip := getClientIP(r)
-	return ip
+	ip := m.getClientIP(r)
+	return ip, entity.IP
 }
 
 // getClientIP extracts the client IP from the request
-func getClientIP(r *http.Request) string {
+func (m *RateLimiterMiddleware) getClientIP(r *http.Request) string {
 	// Check X-Forwarded-For header
 	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
 		ips := net.ParseIP(xff)
@@ -80,4 +82,21 @@ func getClientIP(r *http.Request) string {
 	// Extract from RemoteAddr
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
 	return ip
+}
+
+func (m *RateLimiterMiddleware) getRateLimitConfig(ctx context.Context, key string, keyType string) entity.RateLimitConfig {
+	rlConfig, _ := m.storage.GetRateLimitConfig(ctx, key)
+	if rlConfig != nil {
+		return *rlConfig
+	}
+
+	limitValues := entity.LimitValues(m.config.ByAPIKey)
+	if keyType == entity.IP {
+		limitValues = entity.LimitValues(m.config.ByIP)
+	}
+
+	return entity.RateLimitConfig{
+		Key:         key,
+		LimitValues: limitValues,
+	}
 }

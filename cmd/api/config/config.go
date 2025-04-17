@@ -15,7 +15,8 @@ type App struct {
 
 // RateLimiter properties for configuration
 type RateLimiter struct {
-	ByIP LimitValues
+	ByIP     LimitValues
+	ByAPIKey LimitValues
 }
 
 type LimitValues struct {

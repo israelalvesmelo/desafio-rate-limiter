@@ -33,7 +33,7 @@ func (r *RedisDb) SaveRateLimitConfig(ctx context.Context, apiKey *entity.RateLi
 
 	if redisErr := r.client.Set(
 		ctx,
-		apiKey.Value,
+		apiKey.Key,
 		jsonReq,
 		0,
 	).Err(); redisErr != nil {
@@ -42,6 +42,21 @@ func (r *RedisDb) SaveRateLimitConfig(ctx context.Context, apiKey *entity.RateLi
 	}
 
 	return nil
+}
+
+func (r *RedisDb) GetRateLimitConfig(ctx context.Context, key string) (*entity.RateLimitConfig, error) {
+	jsonReq, err := r.client.Get(ctx, key).Result()
+	if err != nil {
+		log.Println("error getting rate limit config")
+		return nil, err
+	}
+
+	var rateLimitConfig entity.RateLimitConfig
+	if err := json.Unmarshal([]byte(jsonReq), &rateLimitConfig); err != nil {
+		log.Println("error unmarshaling rate limit config")
+		return nil, err
+	}
+	return &rateLimitConfig, nil
 }
 
 func (r *RedisDb) UpsertRequest(ctx context.Context, key string, rl *entity.RateLimiter) error {

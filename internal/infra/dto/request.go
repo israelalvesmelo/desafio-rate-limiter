@@ -3,7 +3,6 @@ package dto
 import "time"
 
 type RequestSave struct {
-	Key     string
 	TimeAdd time.Time
 }
 

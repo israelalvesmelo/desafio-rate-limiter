@@ -12,10 +12,11 @@ import (
 )
 
 type CreateRateLimitConfigInput struct {
-	Ip            string `json:"ip"`             // Ip ou token
-	IsToken       bool   `json:"is_token"`       // Se é um token ou ip
-	Limit         int    `json:"limit"`          // Máximo de requisições por segundo
-	BlockDuration int    `json:"block_duration"` // Duração do bloqueio em segundos
+	Ip              string `json:"ip"`       // Ip ou token
+	IsToken         bool   `json:"is_token"` // Se é um token ou ip
+	MaxRequests     int    `json:"max_requests" binding:"required"`
+	TimeWindow      int64  `json:"time_window" binding:"required"`
+	BlockedDuration int64  `json:"block_duration" binding:"required"`
 }
 
 type CreateRateLimitConfigUseCase interface {
@@ -34,8 +35,11 @@ func NewRateLimitConfigUseCase(storageGateway database.StorageDb) CreateRateLimi
 
 func (c *CreateRateLimitConfigUseCaseImpl) Execute(ctx context.Context, input CreateRateLimitConfigInput) (*dto.RateLimitConfigOutput, error) {
 	rtConf := &entity.RateLimitConfig{
-		Limit:         input.Limit,
-		BlockDuration: input.BlockDuration,
+		LimitValues: entity.LimitValues{
+			MaxRequests:     input.MaxRequests,
+			TimeWindow:      input.TimeWindow,
+			BlockedDuration: input.BlockedDuration,
+		},
 	}
 
 	var value string
@@ -51,16 +55,17 @@ func (c *CreateRateLimitConfigUseCaseImpl) Execute(ctx context.Context, input Cr
 		value = input.Ip
 	}
 
-	rtConf.Value = value
+	rtConf.Key = value
 	err = c.StorageGateway.SaveRateLimitConfig(ctx, rtConf)
 	if err != nil {
 		return nil, err
 	}
 
 	return &dto.RateLimitConfigOutput{
-		Key:           rtConf.Value,
-		Limit:         rtConf.Limit,
-		BlockDuration: rtConf.BlockDuration,
+		Key:             rtConf.Key,
+		MaxRequests:     rtConf.MaxRequests,
+		TimeWindow:      rtConf.TimeWindow,
+		BlockedDuration: rtConf.BlockedDuration,
 	}, nil
 }
 

@@ -1,7 +1,8 @@
 package dto
 
 type RateLimitConfigInput struct {
-	IsToken       bool `json:"is_token"`                           // Se é um token ou ip
-	Limit         int  `json:"limit" validate:"required"`          // Máximo de requisições por segundo
-	BlockDuration int  `json:"block_duration" validate:"required"` // Duração do bloqueio em segundos
+	IsToken       bool  `json:"is_token"`
+	MaxRequests   int   `json:"limit" validate:"required"`
+	TimeWindow    int64 `json:"time_window" validate:"required"`
+	BlockDuration int64 `json:"block_duration" validate:"required"`
 }

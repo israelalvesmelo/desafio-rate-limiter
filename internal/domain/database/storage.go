@@ -7,7 +7,11 @@ import (
 )
 
 type StorageDb interface {
-	SaveRateLimitConfig(ctx context.Context, apiKey *entity.RateLimitConfig) error
+	// SaveRateLimitConfig Stores the rate limit configuration customized by the API key or IP.
+	SaveRateLimitConfig(ctx context.Context, Key *entity.RateLimitConfig) error
+
+	// GetRateLimitConfig Obtains the rate limit configuration customized by the API key or IP.
+	GetRateLimitConfig(ctx context.Context, key string) (*entity.RateLimitConfig, error)
 
 	// UpsertRequest Updates or inserts a new request inside the RateLimiter.Requests array.
 	// This also creates a new instance of Request
