@@ -41,7 +41,7 @@ func (m *RateLimiterMiddleware) Handler(next http.Handler) http.Handler {
 		)
 		if errors.Is(err, entity.ErrIPExceededAmountRequest) {
 			log.Printf("Error executing request: %s\n", err.Error())
-			http.Error(w, err.Error(), http.StatusTooManyRequests)
+			http.Error(w, err.Error(), http.StatusTooManyRequests) //TODO: MUDAR PARA JSON
 			return
 		}
 		if err != nil {
@@ -66,7 +66,7 @@ func (m *RateLimiterMiddleware) getKey(r *http.Request) (string, string) {
 		return apiKey, entity.APIKeyName
 	}
 	ip := m.getClientIP(r)
-	return ip, entity.IP
+	return ip, entity.IPName
 }
 
 // getClientIP extracts the client IP from the request
@@ -91,7 +91,7 @@ func (m *RateLimiterMiddleware) getRateLimitConfig(ctx context.Context, key stri
 	}
 
 	limitValues := entity.LimitValues(m.config.ByAPIKey)
-	if keyType == entity.IP {
+	if keyType == entity.IPName {
 		limitValues = entity.LimitValues(m.config.ByIP)
 	}
 

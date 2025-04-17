@@ -50,6 +50,10 @@ func (v *Viper) readConfig(c *Config) {
 	c.RateLimiter.ByIP.BlockedDuration = viper.GetInt64("rate_limiter.by_ip.blocked_duration")
 	c.RateLimiter.ByIP.TimeWindow = viper.GetInt64("rate_limiter.by_ip.time_window")
 	c.RateLimiter.ByIP.MaxRequests = viper.GetInt("rate_limiter.by_ip.max_requests")
+
+	c.RateLimiter.ByAPIKey.BlockedDuration = viper.GetInt64("rate_limiter.by_api_key.blocked_duration")
+	c.RateLimiter.ByAPIKey.TimeWindow = viper.GetInt64("rate_limiter.by_api_key.time_window")
+	c.RateLimiter.ByAPIKey.MaxRequests = viper.GetInt("rate_limiter.by_api_key.max_requests")
 }
 
 //TODO: REVISAR ESSAS CONFIGS

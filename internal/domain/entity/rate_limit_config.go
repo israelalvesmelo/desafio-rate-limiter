@@ -5,11 +5,11 @@ const (
 	PrefixBlockedDurationKey = "blocked:key"
 	StatusBlocked            = "Blocked"
 	APIKeyName               = "API_KEY"
-	IP                       = "IP"
+	IPName                   = "IP"
 )
 
 type RateLimitConfig struct {
-	Key string `json:"value" binding:"required"`
+	Key string `json:"key" binding:"required"`
 	LimitValues
 }
 

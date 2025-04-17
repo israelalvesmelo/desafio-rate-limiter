@@ -9,3 +9,7 @@ var (
 	ErrRateLimiterTimeWindow       = errors.New("rate limiter time window duration should be greater than zero")
 	ErrRateLimiterMaxRequests      = errors.New("rate limiter maximum requests should be greater than zero")
 )
+
+type MsgError struct {
+	Message string `json:"message"`
+}

@@ -12,11 +12,11 @@ import (
 )
 
 type CreateRateLimitConfigInput struct {
-	Ip              string `json:"ip"`       // Ip ou token
-	IsToken         bool   `json:"is_token"` // Se é um token ou ip
-	MaxRequests     int    `json:"max_requests" binding:"required"`
-	TimeWindow      int64  `json:"time_window" binding:"required"`
-	BlockedDuration int64  `json:"block_duration" binding:"required"`
+	Key             string
+	IsToken         bool
+	MaxRequests     int
+	TimeWindow      int64
+	BlockedDuration int64
 }
 
 type CreateRateLimitConfigUseCase interface {
@@ -52,7 +52,7 @@ func (c *CreateRateLimitConfigUseCaseImpl) Execute(ctx context.Context, input Cr
 			return nil, err
 		}
 	} else {
-		value = input.Ip
+		value = input.Key
 	}
 
 	rtConf.Key = value
