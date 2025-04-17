@@ -40,7 +40,7 @@ func main() {
 	rateLimitConfigHandler := handler.NewRateLimitConfigHandler(createApiKey)
 
 	// Create middleware
-	limiter := middleware.NewRateLimitMiddleware()
+	limiter := middleware.NewRateLimitMiddleware(storageGateway, cfg)
 
 	// Create webserver
 	server := webserver.NewWebServer(fmt.Sprintf(":%s", cfg.App.Port))
