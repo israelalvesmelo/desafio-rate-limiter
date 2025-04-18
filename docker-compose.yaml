@@ -30,17 +30,17 @@ services:
       redis:
         condition: service_healthy
 
-#  go-cli-test:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-cli-test
-#    image: go-cli-test
-#    container_name: go-cli-test
-#    networks:
-#      - rate-limit
-#    depends_on:
-#      redis:
-#        condition: service_healthy
+  go-cli-test:
+    build:
+      context: .
+      dockerfile: Dockerfile-cli-test
+    image: go-cli-test
+    container_name: go-cli-test
+    networks:
+      - rate-limit
+    depends_on:
+      redis:
+        condition: service_healthy
 
 networks:
   rate-limit:

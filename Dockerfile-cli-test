@@ -1,8 +1,9 @@
-FROM golang:1.21.5-bookworm as builder
+FROM golang:1.23-alpine as builder
 WORKDIR /app
 COPY . .
-RUN make init && make build-cli-test
+RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-w -s" -o cli-test ./cmd/cli
 
 FROM scratch
 COPY --from=builder /app/cli-test .
+
 ENTRYPOINT ["./cli-test"]
