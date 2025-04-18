@@ -1,6 +1,7 @@
 package entity
 
-//TODO: ADICIONAR O LICENSE
+// Este arquivo contém trechos de código licenciados sob a Licença MIT,
+// originalmente criados por kenesparta. Veja o arquivo LICENSE para detalhes.
 
 import (
 	"sync"

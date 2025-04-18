@@ -41,9 +41,10 @@ func (v *Viper) ReadViper(config *Config) {
 }
 
 func (v *Viper) readConfig(c *Config) {
-	c.Redis.Db = viper.GetInt("redis.db")
-	c.Redis.Host = viper.GetString("redis.host")
-	c.Redis.Port = viper.GetString("redis.port")
+	c.DataBase.Name = viper.GetString("database.name")
+	c.DataBase.Db = viper.GetInt("database.db")
+	c.DataBase.Host = viper.GetString("database.host")
+	c.DataBase.Port = viper.GetString("database.port")
 
 	c.App.Host = viper.GetString("app.host")
 	c.App.Port = viper.GetString("app.port")
@@ -60,10 +61,11 @@ func (v *Viper) readConfig(c *Config) {
 func (v *Viper) logConfig(c *Config) {
 	fmt.Println("=== Configuration Loaded ===")
 
-	fmt.Println("\n[Redis]")
-	fmt.Printf("DB: %d\n", c.Redis.Db)
-	fmt.Printf("Host: %s\n", c.Redis.Host)
-	fmt.Printf("Port: %s\n", c.Redis.Port)
+	fmt.Println("\n[DataBase]")
+	fmt.Printf("Name: %s\n", c.DataBase.Name)
+	fmt.Printf("DB: %d\n", c.DataBase.Db)
+	fmt.Printf("Host: %s\n", c.DataBase.Host)
+	fmt.Printf("Port: %s\n", c.DataBase.Port)
 
 	fmt.Println("\n[App]")
 	fmt.Printf("Host: %s\n", c.App.Host)
@@ -81,5 +83,3 @@ func (v *Viper) logConfig(c *Config) {
 
 	fmt.Println("\n=== End of Configuration ===")
 }
-
-//TODO: REVISAR ESSAS CONFIGS

@@ -1,7 +1,8 @@
 package config
 
-// Redis configuration related to this specific database
-type Redis struct {
+// DataBase configuration related to this specific database
+type DataBase struct {
+	Name string
 	Db   int
 	Host string
 	Port string
@@ -27,7 +28,7 @@ type LimitValues struct {
 
 // Config Final Struct Configuration
 type Config struct {
-	Redis       Redis
+	DataBase    DataBase
 	App         App
 	RateLimiter RateLimiter
 }

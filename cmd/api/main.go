@@ -11,7 +11,6 @@ import (
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/middleware"
 
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/webserver"
-	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -21,16 +20,8 @@ func main() {
 	viperCfg := config.NewViper("env")
 	viperCfg.ReadViper(&cfg)
 
-	// Create redis client
-	redisClient := redis.NewClient(
-		&redis.Options{
-			Addr: fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port),
-			DB:   cfg.Redis.Db,
-		},
-	)
-
 	// Create gateway
-	storageGateway := database.NewRedisDb(redisClient)
+	storageGateway, _ := database.GetDatabase(cfg.DataBase)
 
 	// Create use case
 	createApiKey := usecase.NewRateLimitConfigUseCase(storageGateway)

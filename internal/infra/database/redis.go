@@ -20,7 +20,7 @@ type RedisDb struct {
 	client *redis.Client
 }
 
-func NewRedisDb(client *redis.Client) databasedomain.StorageDb {
+func newRedisDb(client *redis.Client) databasedomain.StorageDb {
 	return &RedisDb{client: client}
 }
 

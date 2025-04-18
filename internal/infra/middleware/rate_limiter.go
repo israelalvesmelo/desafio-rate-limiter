@@ -42,7 +42,7 @@ func (m *RateLimiterMiddleware) Handler(next http.Handler) http.Handler {
 		)
 		if errors.Is(err, entity.ErrExceededAmountRequest) {
 			log.Printf("Error executing request: %s\n", err.Error())
-			handler.Error(w, err.Error(), http.StatusTooManyRequests) //TODO: MUDAR PARA JSON
+			handler.Error(w, err.Error(), http.StatusTooManyRequests)
 			return
 		}
 		if err != nil {
