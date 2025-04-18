@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"net"
 	"net/http"
 	"time"
 
@@ -12,7 +11,9 @@ import (
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/domain/database"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/domain/entity"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/domain/usecase"
+	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra"
 	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/dto"
+	"github.com/israelalvesmelo/desafio-rate-limiter/internal/infra/handler"
 )
 
 type RateLimiterMiddleware struct {
@@ -39,20 +40,20 @@ func (m *RateLimiterMiddleware) Handler(next http.Handler) http.Handler {
 			},
 			rtConfig,
 		)
-		if errors.Is(err, entity.ErrIPExceededAmountRequest) {
+		if errors.Is(err, entity.ErrExceededAmountRequest) {
 			log.Printf("Error executing request: %s\n", err.Error())
-			http.Error(w, err.Error(), http.StatusTooManyRequests) //TODO: MUDAR PARA JSON
+			handler.Error(w, err.Error(), http.StatusTooManyRequests) //TODO: MUDAR PARA JSON
 			return
 		}
 		if err != nil {
 			log.Printf("Error executing request: %s\n", err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			handler.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		if !resp.Allow {
-			log.Printf("Too many request: %s\n", entity.ErrIPExceededAmountRequest.Error())
-			http.Error(w, entity.ErrIPExceededAmountRequest.Error(), http.StatusTooManyRequests)
+			log.Printf("Too many request: %s\n", entity.ErrExceededAmountRequest.Error())
+			handler.Error(w, entity.ErrExceededAmountRequest.Error(), http.StatusTooManyRequests)
 			return
 		}
 
@@ -65,23 +66,8 @@ func (m *RateLimiterMiddleware) getKey(r *http.Request) (string, string) {
 	if apiKey != "" {
 		return apiKey, entity.APIKeyName
 	}
-	ip := m.getClientIP(r)
+	ip := infra.GetClientIP(r)
 	return ip, entity.IPName
-}
-
-// getClientIP extracts the client IP from the request
-func (m *RateLimiterMiddleware) getClientIP(r *http.Request) string {
-	// Check X-Forwarded-For header
-	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-		ips := net.ParseIP(xff)
-		if ips != nil {
-			return ips.String()
-		}
-	}
-
-	// Extract from RemoteAddr
-	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	return ip
 }
 
 func (m *RateLimiterMiddleware) getRateLimitConfig(ctx context.Context, key string, keyType string) entity.RateLimitConfig {

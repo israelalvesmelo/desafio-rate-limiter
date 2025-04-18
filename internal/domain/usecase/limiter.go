@@ -26,7 +26,7 @@ func (l *Limiter) Execute(ctx context.Context, input dto.RequestSave, rtConfig e
 	}
 	if status == entity.StatusBlocked {
 		log.Println("ip/key is blocked due to exceeding the maximum number of requests")
-		return nil, entity.ErrIPExceededAmountRequest
+		return nil, entity.ErrExceededAmountRequest
 	}
 
 	getRequest, getReqErr := l.storage.GetRequest(ctx, rtConfig.Key)
