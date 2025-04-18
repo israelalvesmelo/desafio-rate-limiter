@@ -1,9 +1,10 @@
-FROM golang:1.23-alpine
-
+FROM golang:1.23-alpine as builder
 WORKDIR /app
+COPY . .
+RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-w -s" -o server ./cmd/api
 
-RUN apk add --no-cache git && \
-    go install github.com/rakyll/hey@latest
+FROM scratch
+COPY --from=builder /app/cmd/api/env.json .
+COPY --from=builder /app/server .
 
-# Keep container running for development
-CMD ["tail", "-f", "/dev/null"]
+CMD ["./server"]

@@ -37,6 +37,7 @@ func (v *Viper) ReadViper(config *Config) {
 		fmt.Println("Config file changed:", e.Name)
 		v.readConfig(config)
 	})
+	v.logConfig(config)
 }
 
 func (v *Viper) readConfig(c *Config) {
@@ -54,6 +55,31 @@ func (v *Viper) readConfig(c *Config) {
 	c.RateLimiter.ByAPIKey.BlockedDuration = viper.GetInt64("rate_limiter.by_api_key.blocked_duration")
 	c.RateLimiter.ByAPIKey.TimeWindow = viper.GetInt64("rate_limiter.by_api_key.time_window")
 	c.RateLimiter.ByAPIKey.MaxRequests = viper.GetInt("rate_limiter.by_api_key.max_requests")
+}
+
+func (v *Viper) logConfig(c *Config) {
+	fmt.Println("=== Configuration Loaded ===")
+
+	fmt.Println("\n[Redis]")
+	fmt.Printf("DB: %d\n", c.Redis.Db)
+	fmt.Printf("Host: %s\n", c.Redis.Host)
+	fmt.Printf("Port: %s\n", c.Redis.Port)
+
+	fmt.Println("\n[App]")
+	fmt.Printf("Host: %s\n", c.App.Host)
+	fmt.Printf("Port: %s\n", c.App.Port)
+
+	fmt.Println("\n[Rate Limiter - By IP]")
+	fmt.Printf("Blocked Duration: %d seconds\n", c.RateLimiter.ByIP.BlockedDuration)
+	fmt.Printf("Time Window: %d seconds\n", c.RateLimiter.ByIP.TimeWindow)
+	fmt.Printf("Max Requests: %d\n", c.RateLimiter.ByIP.MaxRequests)
+
+	fmt.Println("\n[Rate Limiter - By API Key]")
+	fmt.Printf("Blocked Duration: %d seconds\n", c.RateLimiter.ByAPIKey.BlockedDuration)
+	fmt.Printf("Time Window: %d seconds\n", c.RateLimiter.ByAPIKey.TimeWindow)
+	fmt.Printf("Max Requests: %d\n", c.RateLimiter.ByAPIKey.MaxRequests)
+
+	fmt.Println("\n=== End of Configuration ===")
 }
 
 //TODO: REVISAR ESSAS CONFIGS

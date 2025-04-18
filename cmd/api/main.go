@@ -18,7 +18,7 @@ func main() {
 
 	// Load config
 	var cfg config.Config
-	viperCfg := config.NewViper("../../env")
+	viperCfg := config.NewViper("env")
 	viperCfg.ReadViper(&cfg)
 
 	// Create redis client
