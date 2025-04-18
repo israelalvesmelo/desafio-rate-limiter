@@ -10,7 +10,7 @@ Este projeto implementa um middleware de rate limiting baseado em IP e tokens de
 - [Docker](https://www.docker.com/)
 
 ## Como executar
-- Execute o comando `docker-compose up -d` para iniciar o Redis e o servidor.
+- Execute o comando `docker compose up -d` para iniciar o Redis e o servidor.
 - Caso deseje modificar os parâmetros de configuração, edite o arquivo `cmd/api/env.json`.
 
 
@@ -147,7 +147,7 @@ Usage of ./cli-test:
 - Após [executar a aplicação](#como-executar), você pode executar o seguinte comando para testar o rate limiter:
 
 ```docker
-docker compose run --rm go-cli-test -url http://go-app:8080/hello -m GET -t 1 -r 10
+docker compose run --rm go-cli-test -url http://go-app:8080/hello-world -m GET -t 1 -r 10
 ```
 
 ### Testing with API key
@@ -156,7 +156,7 @@ docker compose run --rm go-cli-test -url http://go-app:8080/hello -m GET -t 1 -r
 - Com o token criado, é necessário executar o seguinte comando com a **flag -k** com o valor do token.
 
 ```docker
-docker compose run --rm go-cli-test -url http://go-app:8080/hello -m GET -t 1 -r 10  -k $[SEU_TOKEN_AQUI]
+docker compose run --rm go-cli-test -url http://go-app:8080/hello-world -m GET -t 1 -r 10  -k $[SEU_TOKEN_AQUI]
 ```
 
 ## Como funciona?
