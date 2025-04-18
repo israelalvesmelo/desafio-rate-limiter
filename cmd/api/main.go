@@ -38,8 +38,8 @@ func main() {
 	server.AddMiddleware(limiter.Handler)
 	server.AddMiddleware(chimiddleware.Logger)
 
-	server.AddHandler("/limiter", rateLimitConfigHandler.Create)
-	server.AddHandler("/hello", helloWorldHandler.HelloWorld)
+	server.AddHandler("/rate-limiter", rateLimitConfigHandler.Create)
+	server.AddHandler("/hello-world", helloWorldHandler.HelloWorld)
 
 	server.Start()
 }
