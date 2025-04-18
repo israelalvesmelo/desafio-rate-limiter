@@ -1,8 +1,8 @@
 # Desafio FullCycle rate limiter
 
-Este projeto implementa um middleware de rate limiting baseado em IP e tokens de acesso, utilizando Redis como armazenamento.
+Este projeto implementa um middleware de rate limiting baseado em IP e tokens de acesso, utilizando o _Redis_ como armazenamento.
 
-## ⚙️ Tecnologias
+## Tecnologias
 
 - [Go](https://go.dev/)
 - [Chi](https://go-chi.io/#/)
@@ -10,15 +10,16 @@ Este projeto implementa um middleware de rate limiting baseado em IP e tokens de
 - [Docker](https://www.docker.com/)
 
 ## Como executar
-- Basta executar o comando `docker-compose up -d` para subir o Redis e o servidor. Caso queira editar os valores de configuração, basta editar o arquivo `cmd/api/env.json`.
+- Execute o comando `docker-compose up -d` para iniciar o Redis e o servidor.
+- Caso deseje modificar os parâmetros de configuração, edite o arquivo `cmd/api/env.json`.
 
 
-## ⚙️ Configuração Rate Limiter
+## Configuração Rate Limiter
 ### IP
-- No arquivo `cmd/api/env.json` possui os valores relacioados ao rate limiter por IP.
+- O arquivo `cmd/api/env.json` define os parâmetros relacionados ao controle de acesso por IP.
 
 
-```
+```json
   "rate_limiter": {
     "by_ip": {
       "time_window": 5,
@@ -34,9 +35,9 @@ Este projeto implementa um middleware de rate limiting baseado em IP e tokens de
 - blocked_duration: Tempo em segundos que o IP será bloqueado após atingir o limite de requisições.
 
 ### Token
-- No arquivo `cmd/api/env.json` possui os valores relacioados ao rate limiter por token.
+- O arquivo `cmd/api/env.json` define os parâmetros relacionados ao controle de acesso por token.
 
-```
+```json
   "rate_limiter": {
     ...
     "by_api_key": {
@@ -54,16 +55,16 @@ Este projeto implementa um middleware de rate limiting baseado em IP e tokens de
 
 Esses são os valores defaults, mas você pode personalizar esses valores para um token ou IP específico.
 
-## 📝 Rotas
+## Rotas
 
 ### Criar o rate limiter do IP ou Token
-- Para customizar o rate limit de um IP ou Token, basta acessar a rota /rate-limiter/ e enviar um JSON com os valores desejados. 
+- Para customizar o rate limit de um IP ou Token, basta acessar a rota /rate-limiter e enviar um JSON com os valores desejados. 
 
 #### Para customizar o rate limiter do IP
-- Para customizar o rate limit do IP, basta executar o curl abaixo. Não é necessário enviar o IP no body da requisição pois o IP é obtido automaticamente pelo middleware.
-Os valores que estão no arquivo env.json deixarão de ser usados para esse IP que está sendo customizado.
+- Para customizar o rate limit de um IP, basta executar o comando curl abaixo. Não é necessário enviar o IP no corpo da requisição, pois o IP é obtido automaticamente pelo middleware. 
+Os valores que estão no arquivo `env.json` deixarão de ser usados para esse IP que está sendo customizado.
 
-```
+```c
 curl --location 'http://localhost:8080/rate-limiter' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -76,7 +77,7 @@ curl --location 'http://localhost:8080/rate-limiter' \
 
 Resposta:
 
-```
+```json
 {
     "key": "$[SEU_IP_AQUI]",
     "max_requests": 3,
@@ -86,9 +87,9 @@ Resposta:
 ```
 
 #### Para customizar o rate limiter do Token
-- Para customizar o rate limit do Token, basta executar o curl abaixo. Um novo token será criado com os valores customizados e os valores que estão no arquivo env.json deixarão de ser usados para esse token.
+- Para customizar o rate limit do Token, basta executar o curl abaixo. Um novo token será criado com os valores customizados e os valores que estão no arquivo `env.json` deixarão de ser usados para esse token.
 
-```
+```c
 curl --location 'http://localhost:8080/rate-limiter' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -100,7 +101,7 @@ curl --location 'http://localhost:8080/rate-limiter' \
 ```
 Resposta:
 
-```
+```json
 {
     "key":  "$[SEU_TOKEN_AQUI]",
     "max_requests": 3,
@@ -110,20 +111,22 @@ Resposta:
 ```
 
 ### Hello World
-- Para testar o rate limiter, basta acessar a rota /hello-world. 
+- Essa rota serve para testar o rate limiter, basta acessar a rota /hello-world. 
 
-```
+```c
 curl --location 'http://localhost:8080/hello-world' \
---header 'API_KEY: e38f28e492c34d7a95a208476720b63510c52663c05be73e7e905bdf2d3dccec'
+--header 'API_KEY: $[SEU_TOKEN_AQUI]''
 ```
->Vale ressaltar que o header API_KEY é opcional, caso não seja enviado, o rate limiter será aplicado apenas para o IP do cliente.
+
+>Vale ressaltar que o header API_KEY é opcional. Caso não seja enviado, a regra do rate limiter será aplicado apenas ao IP do cliente.
 
 
+## Como testar?
+Para aprender mais sobre o CLI, você pode executar o seguinte comando:
 
-## How can I test?
-To learn more about the CLI using for test, you can run this:
-
-``` docker compose run --rm go-cli-test -h ```
+```docker
+ docker compose run --rm go-cli-test -h 
+```
 
 Resposta:
 
@@ -140,24 +143,66 @@ Usage of ./cli-test:
   -url string
         URL to test
 ```
-### Testing with IP:
-- Apos [executar a aplicação](#como-executar), você pode executar o seguinte comando para testar o rate limiter:
+### Testando com IP:
+- Após [executar a aplicação](#como-executar), você pode executar o seguinte comando para testar o rate limiter:
 
-```
+```docker
 docker compose run --rm go-cli-test -url http://go-app:8080/hello -m GET -t 1 -r 10
 ```
 
 ### Testing with API key
 
-- Primeiro é necessario [criar um token](#para-customizar-o-rate-limiter-do-token)
-- Com o token criado, é necessario executar o seguinte comando com a flag -k com o valor do token.
+- Primeiro é necessário [criar um token](#para-customizar-o-rate-limiter-do-token)
+- Com o token criado, é necessário executar o seguinte comando com a **flag -k** com o valor do token.
 
-```
+```docker
 docker compose run --rm go-cli-test -url http://go-app:8080/hello -m GET -t 1 -r 10  -k $[SEU_TOKEN_AQUI]
 ```
 
-## 🏭 Como funciona?
+## Como funciona?
+- A struct de controle de rate limit é essa:
 
+```go
+// RateLimiter is a struct that implements rate limiting logic.
+// It's designed to limit the number of Requests allowed within a specified time window.
+type RateLimiter struct {
+    // Requests is a slice of time.Time that holds the timestamps of the incoming Requests.
+    // It is used to keep track of the Requests that have been made and whether a new request
+    // should be allowed or not based on the timing of previous Requests.
+    Requests []time.Time
+
+    // TimeWindowSec specifies the duration in SECONDS of the time window for which the Requests are counted.
+    // For instance, if TimeWindow is set to 60, the RateLimiter will only consider
+    // the number of Requests in the last minute.
+    TimeWindowSec int64
+
+    // MaxRequests defines the maximum number of Requests that are allowed within the TimeWindow.
+    // For example, if we have TimeWindowSec = 1 and MaxRequests = 100, we obtain the max request limit 100 req/s
+    // Other example, if we have TimeWindowSec = 60 and MaxRequests = 100, we obtain the max request limit 100 req/min
+    MaxRequests int
+
+    // lock is a mutex that ensures that access to the Requests slice is synchronized across multiple goroutines.
+    lock sync.Mutex
+}
+
+```
+
+- **Start Request:** O processo começa quando um cliente faz uma request a qualquer [endpoint](#rotas).
+
+- **Get rate limit config:** O sistema verifica o endereço IP do cliente e verifica se há alguma [customização](#para-customizar-o-rate-limiter-do-ip) de rate limit para esse endereço IP. Se não houver customização, ele usa os valores padrão definidos no arquivo de configuração `env.json`. Caso haja uma customização, ele usa os valores customizados para esse endereço IP. 
+O mesmo ocorre para o token. Quando o header **API_KEY** é enviado, o sistema verifica se há uma [customização](#para-customizar-o-rate-limiter-do-token) de rate limit para esse token. Se não houver customização, ele usa os valores padrão definidos no arquivo de configuração `env.json`. Caso haja uma customização, ele usa os valores customizados para esse token.
+
+- **Save Request:** A request é salva no Redis. O Redis armazena as informações da request associadas ao endereço IP do cliente ou Token.
+
+- **API key or IP exist?:** O sistema consulta o Redis para verificar se já existe algum registro de request para o endereço IP ou Token. Se não houver uma entrada existente, ele cria uma nova instância no Redis para rastreamento.
+
+- **Add request in the request list:** Se existir uma entrada para o endereço IP ou token, a nova request é adicionada à lista associada a esse IP ou Token no Redis. Essa lista mantém o controle de todas as requests dentro de uma determinada time window.
+
+- **Verify Blocked Duration:** Antes de prosseguir, o sistema verifica se o cliente foi bloqueado devido ao excesso de requests. Se o cliente estiver atualmente bloqueado, o processo é encerrado e falha.
+
+- **Verify Limit:** Se o cliente não estiver bloqueado, o sistema verifica se a request atual excede o rate limit estabelecido (o número máximo de requests permitidas na time window).
+
+- **Continue to the endpoint/End:** Se a request não exceder o rate limit, o processo continua para o endpoint, ou seja, a API tratará a request normalmente. Se o rate limit for excedido, o processo é encerrado, indicando que a request não será processada, e normalmente o cliente receberá uma resposta de erro de rate limiting.
 
 ## 📄 Licença
 
