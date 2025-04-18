@@ -9,13 +9,13 @@ Este projeto implementa um middleware de rate limiting baseado em IP e tokens de
 - [Redis](http://redis.io/insight/)
 - [Docker](https://www.docker.com/)
 
-## 🚀 Como executar
-- Basta executar o comando `docker-compose up -d` para subir o Redis e o servidor. Caso queira editar os valores de configuração, basta editar o arquivo `env.json`.
+## Como executar
+- Basta executar o comando `docker-compose up -d` para subir o Redis e o servidor. Caso queira editar os valores de configuração, basta editar o arquivo `cmd/api/env.json`.
 
 
 ## ⚙️ Configuração Rate Limiter
 ### IP
-- No arquivo cmd/api/env.json possui os valores relacioados ao rate limiter por IP.
+- No arquivo `cmd/api/env.json` possui os valores relacioados ao rate limiter por IP.
 
 
 ```
@@ -34,7 +34,7 @@ Este projeto implementa um middleware de rate limiting baseado em IP e tokens de
 - blocked_duration: Tempo em segundos que o IP será bloqueado após atingir o limite de requisições.
 
 ### Token
-- No arquivo cmd/api/env.json possui os valores relacioados ao rate limiter por token.
+- No arquivo `cmd/api/env.json` possui os valores relacioados ao rate limiter por token.
 
 ```
   "rate_limiter": {
@@ -141,9 +141,11 @@ Usage of ./cli-test:
         URL to test
 ```
 ### Testing with IP:
-Apos executar o docker compose up -d, você pode executar o seguinte comando para testar o rate limiter:
+- Apos [executar a aplicação](#como-executar), você pode executar o seguinte comando para testar o rate limiter:
 
+```
 docker compose run --rm go-cli-test -url http://go-app:8080/hello -m GET -t 1 -r 10
+```
 
 ### Testing with API key
 
